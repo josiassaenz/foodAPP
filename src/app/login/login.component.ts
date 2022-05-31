@@ -46,10 +46,10 @@ export class LoginComponent implements OnInit {
   ngOnInit(): void {
     const logger = localStorage.getItem('isUserLoggedIn');
     if (logger) {
-      this.router.navigate(['/delivery']);
+      this.router.navigate(['#/delivery']);
       //this.loginUser(this.credentials);
     } else {
-      this.router.navigate(['/']);
+      this.router.navigate(['/login']);
     }
     this.loginForm = this.formBuilder.group({
       username: new FormControl(
@@ -67,7 +67,6 @@ export class LoginComponent implements OnInit {
     if (!this.validateUser()) {
       return;
     }
-    console.log(this.login);
     this.validar = false;
     const loading: any = this.loadingFireToast(
       'Validando credenciales, por favor espere...'

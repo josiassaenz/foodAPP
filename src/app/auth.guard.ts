@@ -20,13 +20,13 @@ export class AuthGuard implements CanActivate {
     | Promise<boolean | UrlTree>
     | boolean
     | UrlTree {
-    // console.log('isAuth', this.authService.isAuth);
+    console.log('isAuth', this.authService.isAuth);
     if (this.authService.isAuth) {
       //this.router.navigate(['/app']);
       return true;
     }
 
-    this.router.navigate(['/'], { queryParams: { returnUrl: state.url } });
+    this.router.navigate(['/login'], { queryParams: { returnUrl: state.url } });
     return false;
   }
   

@@ -48,10 +48,14 @@ export class AuthService {
     this.currentLoginSubject = new BehaviorSubject<any>(
       token === JSON.parse('null') ? null : token
     );
+    console.log(this.currentLoginSubject.value);
+    
     return this.currentLoginSubject.value !== null;
   }
 
   login(credential: any) {
+    console.log(credential);
+    
     return this.http
       .post<any>(`${environment.API}login_check`, credential)
       .pipe(
@@ -76,5 +80,12 @@ export class AuthService {
     return this.http
       .get<any>(`${environment.API}auth/get-info`)
       .pipe(map((d) => d));
+  }
+
+  logout() {
+    // remove user from local storage to log user out
+    localStorage.removeItem('currentUser');
+    localStorage.removeItem('tokenUser');
+    this.currentLoginSubject.next('');
   }
 }

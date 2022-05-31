@@ -6,12 +6,20 @@ import { Routes, RouterModule } from '@angular/router';
 import { AdminLayoutComponent } from './layouts/admin-layout/admin-layout.component';
 import { LoginComponent } from './login/login.component';
 import { NoAuthGuardGuard } from './no-auth-guard.guard';
+import { AuthGuard } from './auth.guard';
 
 const routes: Routes =[
   {
     path: 'login',
-    canActivate: [NoAuthGuardGuard],
     component: LoginComponent,
+  },
+  {
+    path: '',
+    component: AdminLayoutComponent,
+    children: [{
+      path: '',
+      loadChildren: () => import('./layouts/admin-layout/admin-layout.module').then(m => m.AdminLayoutModule)
+    }]
   },
   {
     path: '**',
@@ -32,3 +40,26 @@ const routes: Routes =[
   ],
 })
 export class AppRoutingModule { }
+/* {
+    path: 'delivery',
+    canActivate: [AuthGuard],
+    component: AdminLayoutComponent,
+    children: [
+      {
+        path: '',
+        loadChildren: () =>
+          import('./layouts/admin-layout/admin-layout.module').then(
+            (m) => m.AdminLayoutModule
+          ),
+      },
+    ],
+  }, 
+  
+  {
+    path: '',
+    component: AdminLayoutComponent,
+    children: [{
+      path: '',
+      loadChildren: () => import('./layouts/admin-layout/admin-layout.module').then(m => m.AdminLayoutModule)
+    }]
+  },*/
