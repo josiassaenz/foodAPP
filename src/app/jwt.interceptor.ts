@@ -4,19 +4,30 @@ import {
   HttpHandler,
   HttpEvent,
   HttpInterceptor,
+  HttpErrorResponse
 } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { AuthService } from './services/auth.service';
+import { Router } from '@angular/router';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class JwtInterceptor implements HttpInterceptor {
-  constructor(private authService: AuthService) {}
+  
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) {}
 
   intercept(
-    request: HttpRequest<unknown>,
+    request: HttpRequest<any>,
     next: HttpHandler
-  ): Observable<HttpEvent<unknown>> {
+  ): Observable<HttpEvent<any>> {
+    
     const currentLogin = this.authService.currentLoginValue;
+    
     if (currentLogin) {
       request = request.clone({
         setHeaders: {
@@ -24,6 +35,17 @@ export class JwtInterceptor implements HttpInterceptor {
         },
       });
     }
-    return next.handle(request);
+    return next.handle(request).pipe(
+      catchError((err: HttpErrorResponse) => {
+
+        if (err.status === 401) {
+          this.router.navigateByUrl('/login');
+        }
+
+        return throwError( err );
+
+      })
+    );
+
   }
 }

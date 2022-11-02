@@ -18,7 +18,7 @@ const routes: Routes =[
     component: AdminLayoutComponent,
     children: [{
       path: '',
-      loadChildren: () => import('./layouts/admin-layout/admin-layout.module').then(m => m.AdminLayoutModule)
+      loadChildren: () => import('./layouts/admin-layout/admin-layout.module').then(m => m.AdminLayoutModule), canActivate: [AuthGuard]
     }]
   },
   {
@@ -40,26 +40,3 @@ const routes: Routes =[
   ],
 })
 export class AppRoutingModule { }
-/* {
-    path: 'delivery',
-    canActivate: [AuthGuard],
-    component: AdminLayoutComponent,
-    children: [
-      {
-        path: '',
-        loadChildren: () =>
-          import('./layouts/admin-layout/admin-layout.module').then(
-            (m) => m.AdminLayoutModule
-          ),
-      },
-    ],
-  }, 
-  
-  {
-    path: '',
-    component: AdminLayoutComponent,
-    children: [{
-      path: '',
-      loadChildren: () => import('./layouts/admin-layout/admin-layout.module').then(m => m.AdminLayoutModule)
-    }]
-  },*/

@@ -1,39 +1,44 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Injectable, OnInit } from '@angular/core';
 import { Login } from '../model/login';
-import { AuthService } from '../services/auth.service';
-//import { loadingFireToast } from 'src/assets/js/toast';
-
-import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
-import {
-  FormBuilder,
-  FormControl,
-  FormGroup,
-  Validators,
-} from '@angular/forms';
+import { AuthService } from '../services/auth.service';
+import { first } from 'rxjs/operators';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { UserService } from 'app/services/user.service';
+
+// import { loadingFireToast } from 'src/assets/js/toast';
+// import Swal from 'sweetalert2';
+
+@Injectable({
+  providedIn: "root"
+})
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']
+  styleUrls: ['./login.component.scss']
 })
 export class LoginComponent implements OnInit {
 
+  loginForm: FormGroup;
+  error = '';
+
   constructor(
-    private authService: AuthService,
+    private formBuilder: FormBuilder,
     private router: Router,
-    private formBuilder: FormBuilder
+    private authenticationService: AuthService,
+    private userService: UserService,
   ) {}
 
   login: Login = {
     username: '',
     password: '',
   };
-  loginForm!: FormGroup;
+
   validar: boolean = false;
-  resetPassword: boolean = false;
   username: string = '';
   typeDataPass: boolean = false;
+  hide = true;
 
   validation_messages = {
     username: [
@@ -44,13 +49,7 @@ export class LoginComponent implements OnInit {
   };
 
   ngOnInit(): void {
-    const logger = localStorage.getItem('isUserLoggedIn');
-    if (logger) {
-      this.router.navigate(['#/delivery']);
-      //this.loginUser(this.credentials);
-    } else {
-      this.router.navigate(['/login']);
-    }
+
     this.loginForm = this.formBuilder.group({
       username: new FormControl(
         '',
@@ -63,26 +62,27 @@ export class LoginComponent implements OnInit {
     });
   }
 
-  loginAdmin() {
-    if (!this.validateUser()) {
+  get f() {
+    return this.loginForm.controls;
+  }
+
+  onSubmit() {
+    if (this.loginForm.invalid) {
       return;
     }
-    this.validar = false;
-    const loading: any = this.loadingFireToast(
-      'Validando credenciales, por favor espere...'
-    );
-    this.authService.login(this.login).subscribe(
-      (res) => {
-        loading.close();
-        //localStorage.setItem('isUserLoggedIn', 'true');
-        window.location.href = window.location.href = '#/delivery';
-      },
-      (error) => {
-        loading.close();
-        this.fireToast(error);
-        console.log('error en el login', error);
-      }
-    );
+
+    this.authenticationService
+      .login(this.f.username.value, this.f.password.value)
+      .pipe(first())
+      .subscribe({
+        next: () => {
+          this.roles(this.f.username.value);
+          this.router.navigate(['/delivery']);
+        },
+        error: (error) => {
+          this.error = error;
+        },
+      });
   }
 
   validateUser() {
@@ -124,25 +124,67 @@ export class LoginComponent implements OnInit {
   }
 
   fireToast(msg: any) {
-    Swal.fire({
-      title: 'Confirmación',
-      text: msg,
-      icon: 'error',
-      confirmButtonColor: '#e6531c',
-      confirmButtonText: 'OK',
-    });
+    console.log(msg);
+    // Swal.fire({
+    //   title: 'Confirmación',
+    //   text: msg,
+    //   icon: 'error',
+    //   confirmButtonColor: '#e6531c',
+    //   confirmButtonText: 'OK',
+    // });
   }
 
   loadingFireToast(title) {
-    return Swal.fire({
-      title,
-      allowEscapeKey: false,
-      allowOutsideClick: false,
-      showConfirmButton: false,
-      didOpen: () => {
-        Swal.showLoading();
+    console.log('Cargando . . .');
+    // return Swal.fire({
+    //   title,
+    //   allowEscapeKey: false,
+    //   allowOutsideClick: false,
+    //   showConfirmButton: false,
+    //   didOpen: () => {
+    //     Swal.showLoading();
+    //   },
+    // });
+  }
+
+  roles(username){
+    // Asigna a las variables de sesión ID, Email y Roles
+    this.userService.getOneUser(username)
+    .subscribe(
+      async (res: any) => {
+        // console.log(res);
+        this.saveData(res.userId, res.emailUser, res.roles);
+        
       },
-    });
+      (error: any) => {
+        console.log('error de parametros', error);
+      }
+    );
+  }
+
+  saveData(userId: any, emailUser: string, roles: string) {
+    sessionStorage.setItem('userId', userId);
+    sessionStorage.setItem('emailUser', emailUser);
+    sessionStorage.setItem('roles', roles);
+  }
+  getDataUserId() {
+    return sessionStorage.getItem('userId');
+  }
+
+  getDataEmailUser() {
+    return sessionStorage.getItem('emailUser');
+  }
+
+  getDataRoles() {
+    return sessionStorage.getItem('roles');
+  }
+
+  removeData() {
+    sessionStorage.removeItem('roles');
+  }
+  
+  deleteData() {
+    sessionStorage.clear();
   }
 
 }

@@ -9,7 +9,7 @@ import { AuthService } from './services/auth.service';
 export class AuthGuard implements CanActivate {
   constructor(
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
   ) {}
 
   canActivate(
@@ -20,7 +20,7 @@ export class AuthGuard implements CanActivate {
     | Promise<boolean | UrlTree>
     | boolean
     | UrlTree {
-    console.log('isAuth', this.authService.isAuth);
+    // console.log('isAuth', this.authService.isAuth);
     if (this.authService.isAuth) {
       //this.router.navigate(['/app']);
       return true;

@@ -1,4 +1,7 @@
-export class UserLogged {
+export class User {
     id?: number;
-    fullName!: string;
+    email!: string;
+    roles?: string;
+    token?: string;
+    is_active?: number;
   }

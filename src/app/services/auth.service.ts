@@ -1,40 +1,51 @@
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { UserLogged } from 'app/model/userLogged';
 import { environment } from 'environments/environment';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { map } from 'rxjs/operators';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { Router } from '@angular/router';
+import { User } from '../model/userLogged';
+import { resolveSanitizationFn } from '@angular/compiler/src/render3/view/template';
+import { UserService } from './../services/user.service';
+// import { AdminLayoutComponent } from 'app/layouts/admin-layout/admin-layout.component';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
-export class AuthService {
 
-  private currentUserSubject: BehaviorSubject<UserLogged>;
-  public currentUser: Observable<UserLogged>;
+export class AuthService {
+  
+  private currentUserSubject: BehaviorSubject<User>;
+  public currentUser: Observable<User>;
   private currentLoginSubject: BehaviorSubject<any>;
   // private currentLoginSubject: BehaviorSubject<LoginResponse>;
   public currentLogin: Observable<any>;
   public auth = false;
+  user: any;
 
-  constructor(private http: HttpClient) {
+  constructor(
+    private http: HttpClient,
+    private userService: UserService,
+  ) {
     const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
-    this.currentUserSubject = new BehaviorSubject<UserLogged>(
+    // const currentUser = JSON.parse(sessionStorage.getItem('roles') || '{}');
+    this.currentUserSubject = new BehaviorSubject<User>(
       currentUser ? currentUser : '{}'
     );
     this.currentUser = this.currentUserSubject.asObservable();
-    const token = JSON.parse(localStorage.getItem('tokenUser') || '{}');
+    const token = JSON.parse(localStorage.getItem('token') || '{}');
     this.currentLoginSubject = new BehaviorSubject<any>(
       token ? token : '{}'
     );
+    
     this.currentLogin = this.currentLoginSubject.asObservable();
   }
 
-  public get currentUserValue(): UserLogged {
+  public get currentUserValue(): User {
     return this.currentUserSubject.value;
   }
 
-  public set currentUserValue(user: UserLogged) {
+  public set currentUserValue(user: User) {
     localStorage.setItem('currentUser', JSON.stringify(user));
     this.currentUserSubject.next(user);
   }
@@ -44,48 +55,58 @@ export class AuthService {
   }
 
   public get isAuth(): boolean {
-    const token = JSON.parse(localStorage.getItem('tokenUser') || 'null');
+    const token = JSON.parse(localStorage.getItem('token') || 'null');
     this.currentLoginSubject = new BehaviorSubject<any>(
       token === JSON.parse('null') ? null : token
     );
-    console.log(this.currentLoginSubject.value);
     
     return this.currentLoginSubject.value !== null;
   }
 
-  login(credential: any) {
-    console.log(credential);
-    
+  // login(credential: any) {
+  login(username: string, password: string) {
     return this.http
-      .post<any>(`${environment.API}login_check`, credential)
+      .post<any>(`${environment.API}login_check`, { "username": username, "password": password })
       .pipe(
         map(
-          (d) => {
-            if (d.status) {
-              this.auth = true;
-              localStorage.setItem('tokenUser', JSON.stringify(d.data.token));
-              this.currentLoginSubject.next(d);
-            }
-            return d.status;
+          ({token}) => {
+            this.auth = true;
+            // console.log('From Auth: ', this.auth);
+            let user: User = {
+              email: username,
+              token: token,
+            };          
+
+            localStorage.setItem('token', JSON.stringify(user.token));
+            this.currentUserSubject.next(user);
+            // console.log(user.token);
+            return user.token;
           },
           (error: any) => {
-            console.log('error al realizar el login', error);
+            console.log('error: ',error);
             return false;
           }
         )
       );
   }
 
-  get() {
-    return this.http
-      .get<any>(`${environment.API}auth/get-info`)
-      .pipe(map((d) => d));
+  getOneUser(value: any) {
+    this.userService.getOneUser(value)
+    .subscribe(data => {
+      this.user = data;
+    });
   }
 
+  // get() {
+  //   return this.http
+  //     .get<any>(`${environment.API}auth/get-info`)
+  //     .pipe(map((d) => d));
+  // }
+
   logout() {
-    // remove user from local storage to log user out
     localStorage.removeItem('currentUser');
-    localStorage.removeItem('tokenUser');
-    this.currentLoginSubject.next('');
+    localStorage.removeItem('token');
+    this.currentUserSubject.next(null);
+    window.location.replace('#/login');
   }
 }

@@ -1,76 +1,61 @@
-<div class="limiter">
-    <div class="container-login100" >
-      <div class="wrap-login100">
-        <div class="login100-form validate-form">
-          <span class="login100-form-logo mb-3">
-            <img src="assets/img/finky_logo.png" width="100px">
-          </span>
-  
-          <span class="login100-form-title p-b-34 p-t-27">
-            Inicia Sesión
-          </span>
-  
-          <div>
-            <form [formGroup]="loginForm" >
-              <div class="wrap-input100 validate-input">
-                <input class="form-control" type="text" placeholder="Usuario" id="username" [(ngModel)]="login.username"
-                formControlName="username" autocomplete="on">
-              </div>
-              <div class="validation-error">
-                <ng-container  *ngFor="let validation of validation_messages.username">
-                      <div
-                        *ngIf="
-                          loginForm.get('username')?.hasError(validation.type) &&
-                          (loginForm.get('username')?.dirty || loginForm.get('username')?.touched)
-                        "
-                      >
-                        {{ validation.message }}
-                      </div>
-                </ng-container>
-              </div>
-  
-              <div class="wrap-input100 validate-input">
-                <!-- <label class="label-form"><i class="pe-7s-{{ typeDataPass ? 'unlock' : 'lock' }} "
-                  (click)="typeDataPass = !typeDataPass" style="cursor: pointer;"></i></label>
-                <input class="form-control" type="{{ typeDataPass ? 'text' : 'password' }}" id="password" [(ngModel)]="login.password"
-                formControlName="password" autocomplete="off" placeholder="Contraseña" />
-                <div class="input-group-append">
-                  <button class="btn btn-outline-secondary" type="button" (click)="typeDataPass = !typeDataPass"><i
-                      class="fa fa-times"></i></button>
-                </div> -->
-                <div class="input-group">
-                  <input class="form-control" type="{{ typeDataPass ? 'text' : 'password' }}" id="password" [(ngModel)]="login.password"
-                  formControlName="password" autocomplete="off" placeholder="Contraseña" />
-                  <div class="input-group-append">
-                    <button class="btn btn-light  active" type="button" (click)="typeDataPass = !typeDataPass"><i
-                      class="fa fa-{{ typeDataPass ? 'eye' : 'eye-slash' }}"></i></button>
+<div class="container">
+    <div class="container-fluid" >
+      <div class="row justify-content-center">
+        <div class="col-md-4">
+          <div class="card">
+            <div class="card-header card-header-danger">
+              <h4 class="card-title">Inicio Sesión</h4>
+            </div>
+            <div class="card-body">
+              <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+                <div>
+                  <div class="row">
+                    <div class="col-md-12">
+                      <mat-form-field class="example-full-width">
+                        <input matInput type="text" placeholder="Correo Eletrónico" id="username" [(ngModel)]="login.username" formControlName="username" autocomplete="on" required>
+                        <mat-hint  *ngFor="let validation of validation_messages.username">
+                          <div
+                            *ngIf="
+                              loginForm.get('username')?.hasError(validation.type) &&
+                              (loginForm.get('username')?.dirty || loginForm.get('username')?.touched)
+                            "
+                          >
+                            {{ validation.message }}
+                          </div>
+                        </mat-hint>
+                      </mat-form-field>
+                    </div>
                   </div>
+
+                  <div class="row">
+                    <div class="col-md-12">
+                      <mat-form-field class="example-full-width">
+                        <input matInput [type]="hide ? 'password' : 'text'" id="password" [(ngModel)]="login.password"
+                        formControlName="password" placeholder="Contraseña" required/>
+                        <mat-icon matSuffix (click)="hide = !hide">{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
+                        <mat-hint *ngFor="let validation of validation_messages.password">
+                          <div
+                            *ngIf="
+                              loginForm.get('password')?.hasError(validation.type) &&
+                              (loginForm.get('password')?.dirty || loginForm.get('password')?.touched)
+                            "
+                          >
+                            {{ validation.message }}
+                          </div>
+                        </mat-hint>
+                      </mat-form-field>
+                    </div>
+                  </div>
+                  <button [disabled]="!loginForm.valid" class="btn btn-danger pull-right" type="submit">
+                    Ingresar
+                  </button>
+                  <div class="clearfix"></div>
                 </div>
-              </div>
-  
-              <div class="validation-error">
-                <ng-container *ngFor="let validation of validation_messages.password">
-                      <div
-                        *ngIf="
-                          loginForm.get('password')?.hasError(validation.type) &&
-                          (loginForm.get('password')?.dirty || loginForm.get('password')?.touched)
-                        "
-                      >
-                        {{ validation.message }}
-                      </div>
-                </ng-container>
-              </div>
-  
-              <div class="container-login100-form-btn">
-                <button class="login100-form-btn" type="submit" (click)="loginAdmin()">
-                  Ingresar
-                </button>
-              </div>
-            </form>
-  
+              </form>
+            </div>
           </div>
-  
         </div>
       </div>
     </div>
   </div>
+

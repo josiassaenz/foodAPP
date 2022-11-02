@@ -8,7 +8,7 @@ import { IconsComponent } from '../../icons/icons.component';
 import { MapsComponent } from '../../maps/maps.component';
 import { NotificationsComponent } from '../../notifications/notifications.component';
 import { UpgradeComponent } from '../../upgrade/upgrade.component';
-import { FacilitatorComponent } from 'app/facilitator/facilitator.component';
+import { FacilitatorComponent } from '../../facilitator/facilitator.component';
 import { DeliveryComponent } from 'app/delivery/delivery.component';
 import { AuthGuard } from 'app/auth.guard';
 
@@ -55,25 +55,46 @@ export const AdminLayoutRoutes: Routes = [
     //         component: UpgradeComponent
     //     }]
     // }
-    { path: 'dashboard',   canActivate: [AuthGuard],   component: DashboardComponent },
-    { path: 'register',    canActivate: [AuthGuard],  component: UserProfileComponent },
-    { path: 'facilitator', canActivate: [AuthGuard],  component: FacilitatorComponent },
-    { path: 'delivery',    canActivate: [AuthGuard],  component: DeliveryComponent },
-    { path: 'table-list',  canActivate: [AuthGuard], component: TableListComponent },
-    {
-        path: '**',
-        canActivate: [AuthGuard],
-        redirectTo: '/delivery',
-      },
+    { path: 'dashboard',      component: DashboardComponent },
+    { path: 'user-profile',   component: UserProfileComponent },
+    { path: 'table-list',     component: TableListComponent },
     // { path: 'typography',     component: TypographyComponent },
     // { path: 'icons',          component: IconsComponent },
     // { path: 'maps',           component: MapsComponent },
     // { path: 'notifications',  component: NotificationsComponent },
     // { path: 'upgrade',        component: UpgradeComponent },
+    { path: 'facilitator',    component: FacilitatorComponent },
+    { path: 'delivery',       component: DeliveryComponent },
+    {
+        path: '**',
+        canActivate: [AuthGuard],
+        redirectTo: '/delivery',
+    },
+    // {
+    //     path: '**',
+    //     canActivate: [AuthGuard],
+    //     redirectTo: '/delivery'
+    //     children: [
+    //         {   path: 'facilitator',      
+    //             component: FacilitatorComponent,
+    //             data: { allowedRoles: ['ROLE_SUPER_ADMIN'] }
+    //         },
+    //         {   path: 'dashboard',      
+    //             component: DashboardComponent,
+    //             data: { allowedRoles: ['ROLE_ADMIN'] }
+    //         },
+    //         {   path: 'user-profile',      
+    //             component: UserProfileComponent,
+    //             data: { allowedRoles: ['ROLE_ADMIN'] }
+    //         },
+    //         {   path: 'table-list',      
+    //             component: TableListComponent,
+    //             data: { allowedRoles: ['ROLE_ADMIN'] }
+    //         },
+    //         {   path: 'delivery',      
+    //             component: DeliveryComponent,
+    //             data: { allowedRoles: ['ROLE_FACILITATOR'] }
+    //         }
+    //     ]
+    // },
 ];
-
-/* canActivate: [AuthGuard],
-canActivate: [AuthGuard],
-canActivate: [AuthGuard],
-canActivate: [AuthGuard],
-canActivate: [AuthGuard], */
